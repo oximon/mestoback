@@ -1,10 +1,11 @@
 const path = require('path');
 const express = require('express');
+const cardRouter = require('./routes/cards.js');
+const userRouter = require('./routes/users.js');
 
 const { PORT = 3000 } = process.env;
 const app = express();
-const cardRouter = require('./routes/cards.js');
-const userRouter = require('./routes/users.js');
+
 
 app
   .use(express.static(path.join(__dirname, 'public')))

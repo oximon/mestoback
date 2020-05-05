@@ -2,7 +2,7 @@
   "name": "webpack",
   "version": "1.0.2",
   "description": "This project is like instagram. Use and relax dude",
-  "main": "src/index.js",
+  "main": "app.js",
   "scripts": {
     "front:build": "cross-env NODE_ENV=production  rimraf public && webpack --mode production",
     "front:dev": "cross-env NODE_ENV=development webpack-dev-server --mode development --open --watch",
