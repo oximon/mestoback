@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Mesto</title>
+    <link
+      rel="stylesheet"
+      href="<%= htmlWebpackPlugin.files.chunks.main.css %>"
+    />
+  </head>
+
+  <body>
+    <div class="root">
+      <header class="header root__section">
+        <img src="<%=require('./images/logo.svg').default%>" alt="mesto logo" class="logo" />
+      </header>
+      <div class="profile root__section">
+        <div class="user-info">
+          <div class="user-info__photo"></div>
+          <div class="user-info__data">
+            <h1 class="user-info__name"></h1>
+            <p class="user-info__job"></p>
+            <button class="button user-info__button-edit">Edit</button>
+          </div>
+          <button class="button user-info__button-add">+</button>
+        </div>
+      </div>
+      <div class="places-list root__section"></div>
+
+      <div class="popup popup_add">
+        <div class="popup__content">
+          <img
+            src="<%=require('./images/close.svg').default%>"
+            alt=""
+            class="popup__close popup__close_add"
+          />
+          <h3 class="popup__title">Новое место</h3>
+          <form class="popup__form" name="new">
+            <div class="popup__input-container">
+              <input
+                id="name-add"
+                type="text"
+                name="name"
+                class="popup__input popup__input_type_name-add"
+                placeholder="Название"
+                required
+                minlength="2"
+                maxlength="32"
+              />
+              <span
+                id="name-add-error"
+                class="popup__input-error popup__input-error_name-add"
+              ></span>
+            </div>
+            <div class="popup__input-container">
+              <input
+                id="link"
+                type="url"
+                name="link"
+                class="popup__input popup__input_type_link-url"
+                placeholder="Ссылка на картинку"
+                required
+              />
+              <span
+                id="link-error"
+                class="popup__input-error popup__input-error_link"
+              ></span>
+            </div>
+
+            <button
+              type="submit"
+              class="button popup__button popup__button_fz_add popup__button_is-disabled"
+            >
+              +
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="popup popup_edit">
+        <div class="popup__content">
+          <img
+            src="<%=require('./images/close.svg').default%>"
+            alt=""
+            class="popup__close popup__close_edit"
+          />
+          <h3 class="popup__title">Редактировать профиль</h3>
+          <form class="popup__form" name="newEdit">
+            <div class="popup__input-container">
+              <input
+                id="name"
+                type="text"
+                name="name"
+                class="popup__input popup__input_type_name"
+                placeholder="Имя"
+                required
+                minlength="2"
+                maxlength="32"
+              />
+              <span
+                id="name-error"
+                class="popup__input-error popup__input_type_name-error"
+              ></span>
+            </div>
+            <div class="popup__input-container">
+              <input
+                id="aboutMe"
+                type="text"
+                name="aboutMe"
+                class="popup__input popup__input_type_link-url"
+                placeholder="О себе"
+                required
+                minlength="2"
+                maxlength="32"
+              />
+              <span
+                id="aboutMe-error"
+                class="popup__input-error popup__input_type_link-url-error"
+              ></span>
+            </div>
+            <button
+              type="submit"
+              class="button popup__button popup__button_fz_edit popup__button_is-enabled"
+            >
+              Сохранить
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="popup popup_avatar">
+        <div class="popup__content">
+          <img
+            src="<%=require('./images/close.svg').default%>"
+            alt=""
+            class="popup__close popup__close_avatar"
+          />
+          <h3 class="popup__title">Обновить аватар</h3>
+          <form class="popup__form" name="newAvatar">
+            <div class="popup__input-container">
+              <input
+                id="avatar"
+                type="url"
+                name="avatar"
+                class="popup__input popup__input_type_avatar"
+                placeholder="Ссылка на аватар"
+                required
+              />
+              <span
+                id="name-error"
+                class="popup__input-error popup__input_type_name-error"
+              ></span>
+            </div>
+            <button
+              type="submit"
+              class="button popup__button popup__button_fz_avatar popup__button_is-disabled"
+            >
+              Сохранить
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="popup popup_open-image">
+        <div class="popup__wrap">
+          <img
+            src="<%=require('./images/close.svg').default%>"
+            alt=""
+            class="popup__close popup__close_open-image"
+          />
+          <img src="" alt="#" class="popup__image" />
+        </div>
+      </div>
+    </div>
+
+    <script
+      type="module"
+      src="<%= htmlWebpackPlugin.files.chunks.main.entry %>"
+    ></script>
+  </body>
+</html>

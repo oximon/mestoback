@@ -1,0 +1,9 @@
+.user-info__button-edit {
+	font-size: 12px;
+	transition: .5s;
+}
+
+.user-info__button-edit:hover {
+	background-color: #fff;
+	color: #000;
+}
