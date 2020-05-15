@@ -8,7 +8,7 @@
     "front:dev": "cross-env NODE_ENV=development webpack-dev-server --mode development --open --watch",
     "front:deploy": "cross-env NODE_ENV=production gh-pages -d public",
     "start": "node app.js",
-		"dev": "nodemon app.js",
+    "dev": "nodemon app.js",
     "lint": "eslint --ext=.js ./ --ignore-path .gitignore"
   },
   "repository": {
@@ -47,8 +47,10 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "body-parser": "^1.19.0",
     "core-js": "^3.4.1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongoose": "^5.9.14"
   },
   "babel": {
     "presets": [
