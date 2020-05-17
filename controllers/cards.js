@@ -3,7 +3,7 @@ const Card = require('../models/card');
 module.exports.getCards = async (req, res) => {
   try {
     const card = await Card.find({})
-      .orFail(() => res.status(404).send('Карточка не найден'))
+      .orFail(() => res.status(404).send('Карточка не найдена'))
       .populate('owner');
     res.send(card);
   } catch (err) {
@@ -29,7 +29,7 @@ module.exports.createCard = async (req, res) => {
 module.exports.deleteCard = async (req, res) => {
   try {
     const card = await Card.findByIdAndRemove(req.params.id)
-      .orFail(() => res.status(404).send('Карточка не найден'));
+      .orFail(() => res.status(404).send('Карточка не найдена'));
     res.send(card);
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -43,7 +43,7 @@ module.exports.likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(() => res.status(404).send('Карточка не найден'));
+      .orFail(() => res.status(404).send('Карточка не найдена'));
     res.send(card);
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -57,7 +57,7 @@ module.exports.dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(() => res.status(404).send('Карточка не найден'));
+      .orFail(() => res.status(404).send('Карточка не найдена'));
     res.send(card);
   } catch (err) {
     res.status(500).send({ message: err.message });
