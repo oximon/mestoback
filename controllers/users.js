@@ -1,39 +1,67 @@
 const User = require('../models/user');
 
-module.exports.getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+module.exports.getUsers = async (req, res) => {
+  try {
+    const user = await User.find({});
+    res.send(user);
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
 };
 
-module.exports.getUser = (req, res) => {
-  User.findById(req.params.id)
-    .then((user) => (res.send({ data: user })))
-    .orFail(res.status(404).send({ message: 'Нет пользователя с таким id' }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+module.exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .orFail(() => res.status(404).send('Пользователь не найден'));
+    res.send(user);
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = async (req, res) => {
   const { name, about, avatar } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .orFail(res.status(400).send({ message: 'Неправильно введены данные' }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+  try {
+    const user = await User.create({ name, about, avatar });
+    res.send({ data: user });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      res.status(400).send({ message: 'Ошибка в валидации данных' });
+    } else {
+      res.status(500).send({ message: err.message });
+    }
+  }
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = async (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
-    .then((user) => res.send({ data: user }))
-    .orFail(res.status(404).send({ message: 'Нет пользователя с таким id' }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+
+  try {
+    const user = await User.findByIdAndUpdate(req.user._id, { name, about })
+      .orFail(() => res.status(404).send('Пользователь не найден'));
+    res.send(user);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      res.status(400).send({ message: 'Ошибка в валидации данных' });
+    } else {
+      res.status(500).send({ message: err.message });
+    }
+  }
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = async (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar })
-    .then((user) => res.send({ data: user }))
-    .orFail(res.status(404).send({ message: 'Нет пользователя с таким id' }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+
+  try {
+    const user = await User.findByIdAndUpdate(req.user._id, { avatar })
+      .orFail(() => res.status(404).send('Пользователь не найден'));
+    res.send(user);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      res.status(400).send({ message: 'Ошибка в валидации данных' });
+    } else {
+      res.status(500).send({ message: err.message });
+    }
+  }
 };
