@@ -3,9 +3,9 @@ const Card = require('../models/card');
 module.exports.getCards = async (req, res) => {
   try {
     const card = await Card.find({})
-      .orFail(() => res.status(404).send('Карточка не найдена'))
+      .orFail(() => res.status(404).send({ message: 'Карточка не найдена' }))
       .populate('owner');
-    res.send(card);
+    res.send({ card });
   } catch (err) {
     res.status(500).res.send({ messate: err.message });
   }
@@ -16,7 +16,7 @@ module.exports.createCard = async (req, res) => {
 
   try {
     const card = await Card.create({ name, link, owner: req.user._id });
-    res.send(card);
+    res.send({ card });
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Ошибка в валидации данных' });
@@ -28,9 +28,10 @@ module.exports.createCard = async (req, res) => {
 
 module.exports.deleteCard = async (req, res) => {
   try {
-    const card = await Card.findByIdAndRemove(req.params.id)
-      .orFail(() => res.status(404).send('Карточка не найдена'));
-    res.send(card);
+    const card = await Card.findById(req.params.id)
+      .orFail(() => res.status(404).send({ message: 'Карточка не найдена' }));
+    card.remove();
+    res.send({ card });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -43,8 +44,8 @@ module.exports.likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(() => res.status(404).send('Карточка не найдена'));
-    res.send(card);
+      .orFail(() => res.status(404).send({ message: 'Карточка не найдена' }));
+    res.send({ card });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -57,8 +58,8 @@ module.exports.dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(() => res.status(404).send('Карточка не найдена'));
-    res.send(card);
+      .orFail(() => res.status(404).send({ message: 'Карточка не найдена' }));
+    res.send({ card });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
