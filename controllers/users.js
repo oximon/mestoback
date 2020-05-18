@@ -1,9 +1,10 @@
+/* eslint-disable max-len */
 const User = require('../models/user');
 
 module.exports.getUsers = async (req, res) => {
   try {
     const user = await User.find({});
-    res.send({ user });
+    res.send({ data: user });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -13,7 +14,7 @@ module.exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
       .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }));
-    res.send({ user });
+    res.send({ data: user });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -40,7 +41,7 @@ module.exports.updateProfile = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true, new: true })
       .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }));
-    res.send({ user });
+    res.send({ data: user });
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Ошибка в валидации данных' });
@@ -56,7 +57,7 @@ module.exports.updateAvatar = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true, new: true })
       .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }));
-    res.send({ user });
+    res.send({ data: user });
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Ошибка в валидации данных' });

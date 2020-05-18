@@ -22,7 +22,6 @@ module.exports = {
       'import/no-named-as-default': 0,
       'import/prefer-default-export': 0,
       'no-useless-escape': 0,
-      'no-underscore-dangle': 0,
-      'max-len': 0
+      'no-underscore-dangle': 0
     }
 };
