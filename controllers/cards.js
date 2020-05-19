@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 const Card = require('../models/card');
 
 module.exports.getCards = async (req, res) => {
@@ -30,8 +31,8 @@ module.exports.deleteCard = async (req, res) => {
   try {
     const card = await Card.findById(req.params.id)
       .orFail(() => res.status(404).send({ message: 'Карточка не найдена' }));
-    card.remove();
     res.send({ data: card });
+    return card.remove();
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
