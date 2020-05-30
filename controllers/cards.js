@@ -31,11 +31,11 @@ module.exports.deleteCard = async (req, res) => {
   try {
     const card = await Card.findById(req.params.id)
       .orFail(() => res.status(404).send({ message: 'Карточка не найдена' }));
-    res.send({ data: card });
-
     if (card.owner !== req.user._id) {
-      return Promise.reject(new Error({ message: 'Недостаточно прав' }));
+      // eslint-disable-next-line no-throw-literal
+      throw ({ message: 'Недостаточно прав' });
     }
+    res.send({ data: card });
     return card.remove();
   } catch (err) {
     res.status(500).send({ message: err.message });

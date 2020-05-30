@@ -23,7 +23,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app
   .post('/signup', createUser)
   .post('/signin', login)
-  // .use(auth)
+  .use(auth)
   .use(cardRouter)
   .use(userRouter)
   .use('*', (req, res) => res.status(404).send({

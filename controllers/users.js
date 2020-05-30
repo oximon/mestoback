@@ -32,7 +32,11 @@ module.exports.createUser = async (req, res) => {
     const user = await User.create({
       name, about, avatar, email, password: hash,
     });
-    res.send({ data: user });
+    res.send({
+      data: {
+        name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+      },
+    });
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Ошибка в валидации данных' });
@@ -42,7 +46,6 @@ module.exports.createUser = async (req, res) => {
   }
 };
 
-// eslint-disable-next-line consistent-return
 module.exports.updateProfile = async (req, res) => {
   const { name, about } = req.body;
 
@@ -75,16 +78,14 @@ module.exports.updateAvatar = async (req, res) => {
   }
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = async (req, res) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'mega-super-puper-secret', { expiresIn: '7d' });
-
-      res.send({ token });
-    })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
+  try {
+    const user = await User.findUserByCredentials(email, password);
+    const token = jwt.sign({ _id: user._id }, 'mega-super-puper-secret', { expiresIn: '7d' });
+    res.send({ token });
+  } catch (err) {
+    res.status(401).send({ message: 'Неправильные логин или пароль' });
+  }
 };

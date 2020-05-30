@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: (link) => validator.isURL(link),
+      message: 'Неправильные формат ссылки',
     },
     required: true,
   },
@@ -28,6 +29,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: (email) => validator.isEmail(email),
+      message: 'Неправильные формат почты',
     },
   },
   password: {
@@ -37,6 +39,7 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
+
 
 // eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
