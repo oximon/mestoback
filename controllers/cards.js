@@ -31,7 +31,7 @@ module.exports.deleteCard = async (req, res) => {
   try {
     const card = await Card.findById(req.params.id)
       .orFail(() => res.status(404).send({ message: 'Карточка не найдена' }));
-    if (card.owner !== req.user._id) {
+    if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) {
       // eslint-disable-next-line no-throw-literal
       throw ({ message: 'Недостаточно прав' });
     }
