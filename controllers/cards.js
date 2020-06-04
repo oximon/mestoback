@@ -32,8 +32,8 @@ module.exports.deleteCard = async (req, res) => {
     if (card.owner.toString() !== req.user._id) {
       throw new Error({ message: 'Недостаточно прав' });
     }
-    res.send({ data: card });
-    return card.remove();
+    await card.remove();
+    return res.send({ data: card });
   } catch (err) {
     if (err.message === 'Карточка не найдена') {
       return res.status(404).send({ message: err.message });
