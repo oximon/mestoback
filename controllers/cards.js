@@ -1,80 +1,68 @@
 /* eslint-disable consistent-return */
 const Card = require('../models/card');
+const ForbiddenError = require('../errors/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
 
-module.exports.getCards = async (req, res) => {
+module.exports.getCards = async (req, res, next) => {
   try {
     const card = await Card.find({})
       .populate('owner');
     res.send({ data: card });
   } catch (err) {
-    return res.status(500).res.send({ messate: err.message });
+    return next(err);
   }
 };
 
-module.exports.createCard = async (req, res) => {
+module.exports.createCard = async (req, res, next) => {
   const { name, link } = req.body;
 
   try {
     const card = await Card.create({ name, link, owner: req.user._id });
-    res.send({ data: card });
+    return res.send({ data: card });
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res.status(400).send({ message: 'Ошибка в валидации данных' });
-    }
-    return res.status(500).send({ message: err.message });
+    return next(new BadRequestError('Ошибка в валидации данных'));
   }
 };
 
-module.exports.deleteCard = async (req, res) => {
+module.exports.deleteCard = async (req, res, next) => {
   try {
     const card = await Card.findById(req.params.id)
-      .orFail(() => Error('Карточка не найдена'));
+      .orFail(() => new NotFoundError('Карточка не найдена'));
     if (card.owner.toString() !== req.user._id) {
-      throw new Error({ message: 'Недостаточно прав' });
+      throw new ForbiddenError('Недостаточно прав');
     }
     await card.remove();
     return res.send({ data: card });
   } catch (err) {
-    if (err.message === 'Карточка не найдена') {
-      return res.status(404).send({ message: err.message });
-    }
-    if (err.message === 'Недостаточно прав') {
-      return res.status(403).send({ message: err.message });
-    }
-    return res.status(500).send({ message: err.message });
+    return next();
   }
 };
 
-module.exports.likeCard = async (req, res) => {
+module.exports.likeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.id,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(() => Error('Карточка не найдена'));
+      .orFail(() => new NotFoundError('Карточка не найдена'));
     res.send({ data: card });
   } catch (err) {
-    if (err.message === 'Карточка не найдена') {
-      return res.status(404).send({ message: err.message });
-    }
-    return res.status(500).send({ message: err.message });
+    return next(err);
   }
 };
 
-module.exports.dislikeCard = async (req, res) => {
+module.exports.dislikeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.id,
       { $pull: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(() => Error('Карточка не найдена'));
+      .orFail(() => new NotFoundError('Карточка не найдена'));
     res.send({ data: card });
   } catch (err) {
-    if (err.message === 'Карточка не найдена') {
-      return res.status(404).send({ message: err.message });
-    }
-    return res.status(500).send({ message: err.message });
+    return next(err);
   }
 };
