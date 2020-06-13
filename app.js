@@ -8,7 +8,6 @@ const userRouter = require('./routes/users.js');
 const { auth } = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -37,7 +36,7 @@ app
       name: Joi.string().required().min(2).max(30),
       about: Joi.string().required().min(2).max(30),
       avatar: Joi.string().required(),
-      email: Joi.string().required(),
+      email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
     }),
   }), createUser)
@@ -50,16 +49,25 @@ app
   .use(auth)
   .use(cardRouter)
   .use(userRouter)
-  .use('*', (req, res, next) => next(new NotFoundError('Запрашиваемый ресурс не найден')))
+  .use('*', (req, res) => res.status(404).send({ message: 'Запрашиваемый ресурс не найден' }))
   .use(errorLogger)
   .use(errors())
   .use((err, req, res, next) => {
+    if (err.name === 'ValidationError') {
+      return res.status(400).send({ message: 'Ошибка в валидации данных' });
+    }
+    if (err.name === 'MongoError') {
+      return res.status(11000).send({ message: 'Отсутствует почта' });
+    }
+    if (err.name === 'CastError') {
+      return res.status(400).send({ message: 'ID не найден' });
+    }
     if (!err.statusCode) {
       const { statusCode = 500, message } = err;
-      res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
+      return res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
     }
     res.status(err.statusCode).send({ message: err.message });
-    next();
+    return next();
   })
   .listen(PORT, () => {
     console.info(`Listening on port ${PORT}`);

@@ -2,7 +2,6 @@
 const Card = require('../models/card');
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
-const BadRequestError = require('../errors/BadRequestError');
 
 module.exports.getCards = async (req, res, next) => {
   try {
@@ -21,7 +20,7 @@ module.exports.createCard = async (req, res, next) => {
     const card = await Card.create({ name, link, owner: req.user._id });
     return res.send({ data: card });
   } catch (err) {
-    return next(new BadRequestError('Ошибка в валидации данных'));
+    return next(err);
   }
 };
 
@@ -35,7 +34,7 @@ module.exports.deleteCard = async (req, res, next) => {
     await card.remove();
     return res.send({ data: card });
   } catch (err) {
-    return next();
+    return next(err);
   }
 };
 
