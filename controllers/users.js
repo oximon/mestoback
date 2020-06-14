@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
-const ConflictError = require('../errors/ConflictError');
 const AutorizationError = require('../errors/AutorizationError');
 const BadRequestError = require('../errors/BadRequestError');
 
@@ -32,11 +31,6 @@ module.exports.createUser = async (req, res, next) => {
   } = req.body;
 
   try {
-    const checkUser = await User.findOne({ email });
-    if (checkUser) {
-      throw new ConflictError('Пользователь с таким email уже существует');
-    }
-
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
       name, about, avatar, email, password: hash,

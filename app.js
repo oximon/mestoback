@@ -23,7 +23,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-
 app
   .use(requestLogger)
   .get('/crash-test', () => {
@@ -35,14 +34,25 @@ app
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
       about: Joi.string().required().min(2).max(30),
-      avatar: Joi.string().required(),
+      avatar: Joi.string().required().custom((value, helpers) => {
+        const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
+      + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
+            + '((\\d{1,3}\\.){3}\\d{1,3}))' // OR ip (v4) address
+            + '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' // port and path
+            + '(\\?[;&a-z\\d%_.~+=-]*)?' // query string
+            + '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+        if (!pattern.test(value)) {
+          return helpers.error('any.invalid');
+        }
+        return value;
+      }, 'custom validation'),
       email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
     }),
   }), createUser)
   .post('/signin', celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required(),
+      email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
     }),
   }), login)
@@ -54,10 +64,10 @@ app
   .use(errors())
   .use((err, req, res, next) => {
     if (err.name === 'ValidationError') {
-      return res.status(400).send({ message: 'Ошибка в валидации данных' });
+      return res.status(400).send({ message: err.message });
     }
-    if (err.name === 'MongoError') {
-      return res.status(11000).send({ message: 'Отсутствует почта' });
+    if (err.code === 11000) {
+      return res.status(409).send({ message: 'Пользователь с такой почтой уже существует' });
     }
     if (err.name === 'CastError') {
       return res.status(400).send({ message: 'ID не найден' });
