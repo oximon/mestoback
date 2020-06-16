@@ -2,30 +2,30 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../errors/NotFoundError');
+const AutorizationError = require('../errors/AutorizationError');
+const BadRequestError = require('../errors/BadRequestError');
 
-module.exports.getUsers = async (req, res) => {
+module.exports.getUsers = async (req, res, next) => {
   try {
     const user = await User.find({});
     return res.send({ data: user });
   } catch (err) {
-    return res.status(500).send({ message: err.message });
+    return next(err);
   }
 };
 
-module.exports.getUser = async (req, res) => {
+module.exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id)
-      .orFail(() => Error('Пользователь не найден'));
+      .orFail(() => new NotFoundError('Пользователь не найден'));
     return res.send({ data: user });
   } catch (err) {
-    if (err.message === 'Пользователь не найден') {
-      return res.status(404).send({ message: err.message });
-    }
-    return res.status(500).send({ message: err.message });
+    return next(err);
   }
 };
 
-module.exports.createUser = async (req, res) => {
+module.exports.createUser = async (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -35,57 +35,41 @@ module.exports.createUser = async (req, res) => {
     const user = await User.create({
       name, about, avatar, email, password: hash,
     });
-    res.send({
+    return res.send({
       data: {
         name: user.name, about: user.about, avatar: user.avatar, email: user.email,
       },
     });
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Ошибка в валидации данных' });
-    } else {
-      res.status(500).send({ message: err.message });
-    }
+    return next(err);
   }
 };
 
-module.exports.updateProfile = async (req, res) => {
+module.exports.updateProfile = async (req, res, next) => {
   const { name, about } = req.body;
 
   try {
     const user = await User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true, new: true })
-      .orFail(() => Error('Пользователь не найден'));
+      .orFail(() => new NotFoundError('Пользователь не найден'));
     return res.send({ data: user });
   } catch (err) {
-    if (err.message === 'Пользователь не найден') {
-      return res.status(404).send({ message: err.message });
-    }
-    if (err.name === 'ValidationError') {
-      return res.status(400).send({ message: 'Ошибка в валидации данных' });
-    }
-    return res.status(500).send({ message: err.message });
+    return next(new BadRequestError('Ошибка в валидации данных'));
   }
 };
 
-module.exports.updateAvatar = async (req, res) => {
+module.exports.updateAvatar = async (req, res, next) => {
   const { avatar } = req.body;
 
   try {
     const user = await User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true, new: true })
-      .orFail(() => Error('Пользователь не найден'));
-    res.send({ data: user });
+      .orFail(() => new NotFoundError('Пользователь не найден'));
+    return res.send({ data: user });
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Ошибка в валидации данных' });
-    }
-    if (err.message === 'Пользователь не найден') {
-      res.status(404).send({ message: err.message });
-    }
-    res.status(500).send({ message: err.message });
+    return next(new BadRequestError('Ошибка в валидации данных'));
   }
 };
 
-module.exports.login = async (req, res) => {
+module.exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -95,12 +79,12 @@ module.exports.login = async (req, res) => {
       process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
-    res.cookie('jwt', token, {
+    return res.cookie('jwt', token, {
       maxAge: 3600000 * 24 * 7,
       httpOnly: true,
       sameSite: true,
     }).json({ token });
   } catch (err) {
-    res.status(401).send({ message: 'Неправильные логин или пароль' });
+    return next(new AutorizationError('Неправильные почта или пароль'));
   }
 };

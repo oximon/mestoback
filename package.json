@@ -1,5 +1,5 @@
 {
-  "name": "webpack",
+  "name": "backend-mesto",
   "version": "1.0.3",
   "description": "This project is like instagram. Use and relax dude",
   "main": "app.js",
@@ -14,7 +14,7 @@
   },
   "author": "Polyakov Semion <s_Qin4ik@live.ru>",
   "license": "ISC",
-  "homepage": "https://oximon.github.io/mesto/",
+  "homepage": "https://api.project-mesto.tk/",
   "devDependencies": {
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
@@ -24,18 +24,14 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "celebrate": "^12.1.1",
     "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
+    "express-winston": "^4.0.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.14",
-    "validator": "^13.0.0"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env"
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-class-properties"
-    ]
+    "validator": "^13.0.0",
+    "winston": "^3.2.1"
   }
 }
+
